@@ -103,4 +103,19 @@ def updateNotes(request):
     }
     return JsonResponse({'note':note_data})
 
+def changeNotes(request):
+  if request.method == 'POST':
+      note_id = request.POST.get('note_id')
+      title = request.POST.get('title')
+      text = request.POST.get('text')
+
+      note = Notes.objects.get(pk=note_id)
+      note.title = title
+      note.text = text
+      note.save()
+
+      return JsonResponse({'success': True})
+  else:
+      return JsonResponse({'success': False, 'error': 'Invalid request method'})   
+
 

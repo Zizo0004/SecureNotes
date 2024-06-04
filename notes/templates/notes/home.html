@@ -1,52 +1,80 @@
 {% extends 'notes/base.html' %}
-
 {% block content %}
 <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/flatly/bootstrap.min.css">
-
+{% load static %}
+<link rel="stylesheet" href="{% static 'notes/css/style.css' %}">
+<body>
   <h1>Create Note</h1>
   <form id="note-form" method="post">
-    {% csrf_token %}
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required>
+      {% csrf_token %}
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required>
 
-    <label for="text">Text:</label>
-    <textarea id="text" name="text" required></textarea>
+      <label for="text">Text:</label>
+      <textarea id="text" placeholder="Drag box to expand for more space" name="text" required></textarea>
 
-    <button type="button" id="save-note">Save Note</button>
+      <button type="button" id="save-note">Save Note</button>
   </form>
-
+  
   <div id="response-message"></div>
 
   <h1>My Notes</h1>
   <div id="notes-container">
-    {% for note in serialized_notes %}
-      <div class="note">
-        <h2>{{ note.fields.title }}</h2>
-        <p>{{ note.decrypted_text }}</p>
-      </div>
-    {% empty %}
-      <p>No notes found.</p>
-    {% endfor %}
+      {% for note in serialized_notes %}
+          <div class="note">
+              <h2>{{ note.fields.title }}</h2>
+              <p>{{ note.decrypted_text }}</p>
+          </div>
+      {% empty %}
+          <p>No notes found.</p>
+      {% endfor %}
   </div>
 
   <div id="edit-modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Edit Note</h2>
-      <form id="edit-form">
-        <input type="text" id="edit-title" placeholder="Title">
-        <textarea id="edit-text" placeholder="Text"></textarea>
-        <button type="submit">Save</button>
-      </form>
-    </div>
+      <div class="modal-content">
+          <div class="modal-header">
+              <h2>Edit Note</h2>
+          </div>
+          <div class="modal-body">
+              <form id="edit-form">
+                  <input type="hidden" id="note-id-input" name="note_id">
+                  <input type="text" id="edit-title" placeholder="Title">
+                  <textarea id="edit-text" placeholder="Text"></textarea>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="submit" form="edit-form">Save</button>
+          </div>
+      </div>
   </div>
+</body>
   
 
 {% block script %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    console.log("Script started");
+     var currentNoteId; 
+    function openEditModal(noteId) {
+      currentNoteId = noteId;
+  // Send an AJAX request to fetch the note data
+  $.ajax({
+    url: `{% url 'updateNotes' %}?note_id=${noteId}`,
+    type: 'GET',
+    success: function(response) {
+      // Populate the edit form with the note data
+      $('#edit-title').val(response.note.fields.title);
+      $('#edit-text').val(response.note.fields.text);
 
+      // Show the edit modal
+      $('#edit-modal').show();
+    },
+    error: function(xhr, status, error) {
+      console.log("AJAX error");
+      console.log("Status:", status);
+      console.log("Error:", error);
+    }
+  });
+}
     function displayNotes() {
       $.ajax({
         url: '{% url "displayNotes" %}',
@@ -81,10 +109,43 @@
         }
       });
     }
+    $('#edit-form').submit(function(event) {
+  event.preventDefault(); // Prevent the form from submitting normally
+
+  var noteId = currentNoteId
+  var updatedTitle = $('#edit-title').val();
+  var updatedText = $('#edit-text').val();
+
+  // Send an AJAX request to update the note
+  $.ajax({
+    url: `{% url 'changeNotes' %}`,
+    type: 'POST',
+    data: {
+      'note_id': noteId,
+      'title': updatedTitle,
+      'text': updatedText,
+      'csrfmiddlewaretoken': '{{ csrf_token }}' // Include the CSRF token
+    },
+    success: function(response) {
+    var noteElement = $(`.note[data-note-id="${noteId}"]`);
+
+    // Update the note display
+    noteElement.find('h2').text(updatedTitle);
+    noteElement.find('p').text(updatedText);
+      $('#edit-modal').hide();
+    },
+    error: function(xhr, status, error) {
+      console.log("AJAX error");
+      console.log("Status:", status);
+      console.log("Error:", error);
+    }
+  });
+});
+
+    
+
+
     displayNotes()
-
-
-
     $(document).ready(function() {
       console.log("Document ready");
       
