@@ -24,8 +24,9 @@ SECRET_KEY = 'django-insecure-tc-0$z&4#!!5t$g(u*)y&p8%556k44dl1n=6y(jodxa%2(9pt=
 CRYPTO_KEY = Fernet.generate_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+LOGIN_URL = 'login'  # redirect my users to login if they're not authenticated
 ALLOWED_HOSTS = []
+
 
 
 # Application definition
@@ -34,11 +35,16 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    "crispy_forms",
+    "crispy_bootstrap5", # 
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'notes'
+    'notes',
+
 ]
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -48,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'SecureNotes.urls'
@@ -55,7 +62,7 @@ ROOT_URLCONF = 'SecureNotes.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,6 +87,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Database-backed sessions
+SESSION_COOKIE_AGE = 604800
 
 
 # Password validation
@@ -118,7 +128,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+

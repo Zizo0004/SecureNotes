@@ -1,0 +1,22 @@
+{% extends 'notes/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}   
+  <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+
+  <div class="container" style="width:500px;">
+    <br>
+    <br>
+    <br>
+    <h2>Sign Up</h2>
+    <br> 
+    <form method="post">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button type="submit">Submit</button>
+    </form>
+
+</div>
+
+
+  {% endblock %}

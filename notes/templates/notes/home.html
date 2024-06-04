@@ -1,0 +1,34 @@
+{% extends 'notes/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <h1>Create Note</h1>
+  <form id="note-form">
+    {% csrf_token %}
+    <label for="title">Title:</label>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <input type="text" id="title" name="title" required>
+
+    <label for="text">Text:</label>
+    <textarea id="text" name="text" required></textarea>
+
+    <button type="button" id="save-note">Save Note</button>
+  </form>
+  <div id="response-message"></div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    console.log("Script started");
+
+    $(document).ready(function() {
+      console.log("Document ready");
+      
+      $('#save-note').click(function() {
+        console.log("Button clicked");
+      });
+    });
+
+    console.log("Script ended");
+  </script>
+{% endblock %}
