@@ -1,12 +1,10 @@
 {% extends 'notes/base.html' %}
-{% load crispy_forms_tags %}
 
 {% block content %}
   <h1>Create Note</h1>
-  <form id="note-form">
+  <form id="note-form" method="post">
     {% csrf_token %}
     <label for="title">Title:</label>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <input type="text" id="title" name="title" required>
 
     <label for="text">Text:</label>
@@ -14,21 +12,110 @@
 
     <button type="button" id="save-note">Save Note</button>
   </form>
+
   <div id="response-message"></div>
-{% endblock %}
+
+  <h1>My Notes</h1>
+  <div id="notes-container">
+    {% for note in serialized_notes %}
+      <div class="note">
+        <h2>{{ note.fields.title }}</h2>
+        <p>{{ note.decrypted_text }}</p>
+      </div>
+    {% empty %}
+      <p>No notes found.</p>
+    {% endfor %}
+  </div>
+  
 
 {% block script %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     console.log("Script started");
+
+    function displayNotes() {
+      $.ajax({
+        url: '{% url "displayNotes" %}',
+        type: 'GET',
+        success: function(response) {
+          var notesContainer = $('#notes-container');
+          notesContainer.empty();
+          if (response.notes.length > 0) {
+             /*response.notes.forEach(function(note) {
+              var noteElement = $('<div class="note"></div>');
+              noteElement.append('<h2>' + note.title + '</h2>');
+              noteElement.append('<p>' + note.decrypted_text + '</p>');
+              notesContainer.append(noteElement);
+            }); */
+            var notes = JSON.parse(response.notes);
+
+            for(const n of notes){
+              console.log(n)
+              if (n.fields) { // Check if n.fields exists
+               var noteElement = $('<div class="note"></div>');
+                noteElement.append('<h2>' + (n.fields.title || 'ti') + '</h2>');
+                noteElement.append('<p>' + (n.fields.text || 'it') + '</p>');
+               notesContainer.append(noteElement);
+                          }
+            }
+          }
+           else {
+            notesContainer.append('<p>No notes found.</p>');
+          }
+        },
+        error: function(xhr, status, error) {
+          console.log("AJAX error");
+          console.log("Status:", status);
+          console.log("Error:", error);
+        }
+      });
+    }
+    displayNotes()
+
+
 
     $(document).ready(function() {
       console.log("Document ready");
       
       $('#save-note').click(function() {
         console.log("Button clicked");
+        
+        var title = $('#title').val();
+        var text = $('#text').val();
+        var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+        
+        console.log("Title:", title);
+        console.log("Text:", text);
+        console.log("CSRF Token:", csrfToken);
+        
+        $.ajax({
+          url: '{% url "createNotes" %}',
+          type: 'POST',
+          data: {
+            'title': title,
+            'text': text,
+            'csrfmiddlewaretoken': csrfToken
+          },
+          
+          success: function(response) {
+            console.log("AJAX success");
+            $('#response-message').text('Note created successfully').css('color', 'green');
+            $('#note-form')[0].reset();
+          },
+          error: function(xhr, status, error) {
+            console.log("AJAX error");
+            console.log("Status:", status);
+            console.log("Error:", error);
+            $('#response-message').text('An error occurred: ' + error).css('color', 'red');
+          }
+        });
       });
+
+
     });
 
     console.log("Script ended");
   </script>
+{% endblock %}
+
 {% endblock %}

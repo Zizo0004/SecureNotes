@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Notes
 from django.http import JsonResponse
 from SecureNotes.settings import CRYPTO_KEY
+from django.core import serializers
+
 
 
 
@@ -17,6 +19,8 @@ def encryption(text,key):
     encryption_key = Fernet(key)
     encrypted_message = encryption_key.encrypt(text.encode())
     return encrypted_message
+    from django.core import serializers
+
 
 def decryption(text,key):
     decryption_key = Fernet(key)
@@ -71,5 +75,21 @@ def createNotes(request):
         return JsonResponse({'message': "Note created successfully"})
     else:
         return JsonResponse({'message': "Invalid request method"}, status=400)
+
+@login_required    
+def displayNotes(request):
+    if request.method == "GET":
+        user = request.user
+        notes = Notes.objects.filter(user=user)
+        serialized_notes = serializers.serialize('json', notes)
+        return JsonResponse({'message': "Notes successfully listed", 'notes': serialized_notes}, status=200)
+
+    else:
+        return JsonResponse({'message': "Invalid request method"}, status=400)
+
+
+@login_required    
+def deleteNotes(request):
+    pass
 
 

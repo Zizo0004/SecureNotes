@@ -8,5 +8,6 @@ urlpatterns = [
     path('login/',views.login_page,name="login"),
     path('home/',views.home,name="home"),
     path('create-note/',views.createNotes,name="createNotes"),
+    path('display-notes/',views.displayNotes,name="displayNotes"),
     path('test/', TemplateView.as_view(template_name='notes/test.html'), name='test'),
 ]
