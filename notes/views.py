@@ -89,7 +89,18 @@ def displayNotes(request):
 
 
 @login_required    
-def deleteNotes(request):
-    pass
+def updateNotes(request):
+    noteID = request.GET.get('note_id')
+    note = Notes.objects.get(pk=noteID)
+    note_data = {
+      'pk': note.pk,
+      'fields': {
+          'title': note.title,
+          'text': note.text,
+          'date_created': note.date_created.isoformat(),
+          'user': note.user.id
+      }
+    }
+    return JsonResponse({'note':note_data})
 
 

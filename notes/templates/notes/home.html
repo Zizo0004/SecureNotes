@@ -1,6 +1,8 @@
 {% extends 'notes/base.html' %}
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/flatly/bootstrap.min.css">
+
   <h1>Create Note</h1>
   <form id="note-form" method="post">
     {% csrf_token %}
@@ -26,6 +28,18 @@
       <p>No notes found.</p>
     {% endfor %}
   </div>
+
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Edit Note</h2>
+      <form id="edit-form">
+        <input type="text" id="edit-title" placeholder="Title">
+        <textarea id="edit-text" placeholder="Text"></textarea>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
   
 
 {% block script %}
@@ -41,23 +55,20 @@
           var notesContainer = $('#notes-container');
           notesContainer.empty();
           if (response.notes.length > 0) {
-             /*response.notes.forEach(function(note) {
-              var noteElement = $('<div class="note"></div>');
-              noteElement.append('<h2>' + note.title + '</h2>');
-              noteElement.append('<p>' + note.decrypted_text + '</p>');
-              notesContainer.append(noteElement);
-            }); */
             var notes = JSON.parse(response.notes);
-
             for(const n of notes){
-              console.log(n)
               if (n.fields) { // Check if n.fields exists
                var noteElement = $('<div class="note"></div>');
                 noteElement.append('<h2>' + (n.fields.title || 'ti') + '</h2>');
                 noteElement.append('<p>' + (n.fields.text || 'it') + '</p>');
-               notesContainer.append(noteElement);
+                noteElement.append(`<button class="edit-btn" data-note-id="${n.pk}">Edit</button>`);
+                notesContainer.append(noteElement); 
                           }
             }
+            $('.edit-btn').click(function() {
+            var noteId = $(this).data('note-id');
+            openEditModal(noteId);
+            });
           }
            else {
             notesContainer.append('<p>No notes found.</p>');
