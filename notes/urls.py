@@ -12,4 +12,5 @@ urlpatterns = [
     path('test/', TemplateView.as_view(template_name='notes/test.html'), name='test'),
     path('update-notes/',views.updateNotes,name="updateNotes"),
     path('change-notes/',views.changeNotes,name="changeNotes"),
+    path('delete-notes/',views.deleteNotes,name="deleteNotes")
 ]

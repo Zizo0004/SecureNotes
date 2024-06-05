@@ -116,6 +116,19 @@ def changeNotes(request):
 
       return JsonResponse({'success': True})
   else:
-      return JsonResponse({'success': False, 'error': 'Invalid request method'})   
+      return JsonResponse({'success': False, 'error': 'Invalid request method'}) 
+
+def deleteNotes(request):
+  print("deletion working")
+  if request.method == 'POST':
+    note_id = request.POST.get('note_id')
+    try:
+      note = Notes.objects.get(id=note_id)
+      note.delete()
+      return JsonResponse({'success': True})
+    except Notes.DoesNotExist:
+      return JsonResponse({'success': False, 'error': 'Note not found'})
+  else:
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 

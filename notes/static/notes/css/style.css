@@ -152,7 +152,7 @@ button:hover{
 }
 #editText{
   width: 115%;
-  height: 100%;
+  height: 80%;
   display: flex;
   color: #3b5023;
 }
@@ -182,3 +182,19 @@ button:hover{
   height: 100%;
   width: 100%;
 }
+
+
+.delete-btn {
+  margin: 0px 8px !important;
+  cursor: pointer;
+  background: red;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+  background: #a21b1b;
+ }
+ .delete-btn:hover{
+  background-color:#e62222 ;
+  transform: translateY(-4px) translateX(-2px);
+  box-shadow: 4px 5px 0 0 black;
+ }
