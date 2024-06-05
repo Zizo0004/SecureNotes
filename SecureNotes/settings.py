@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-tc-0$z&4#!!5t$g(u*)y&p8%556k44dl1n=6y(jodxa%2(9pt='
-CRYPTO_KEY = Fernet.generate_key()
+CRYPTO_KEY = b'4rePrXAvj__CDh13VVa26YhVKxVH4yftOZYw7sqwdKw='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 LOGIN_URL = 'login'  # redirect my users to login if they're not authenticated

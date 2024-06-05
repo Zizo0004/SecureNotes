@@ -10,22 +10,23 @@ from .models import Notes
 from django.http import JsonResponse
 from SecureNotes.settings import CRYPTO_KEY
 from django.core import serializers
+import logging
+logger = logging.getLogger(__name__)
+
+f = Fernet(CRYPTO_KEY)
 
 
 
-
-
-def encryption(text,key):
-    encryption_key = Fernet(key)
-    encrypted_message = encryption_key.encrypt(text.encode())
+def encryption(text):
+    encrypted_message = f.encrypt(text.encode())
     return encrypted_message
-    from django.core import serializers
+
+def decryption(encrypted_text):
+    x = encrypted_text.encode()
+    message = x.replace(b"b'", b"").replace(b"'", b"")
+    return f.decrypt(message).decode()
 
 
-def decryption(text,key):
-    decryption_key = Fernet(key)
-    decrypted_message = decryption_key.decrypt(text).decode()
-    return decrypted_message
 
 def signup(request):
 
@@ -64,12 +65,13 @@ from django.http import JsonResponse
 
 @login_required
 def createNotes(request):
-    print("WORKS")
     if request.method == "POST":
         title = request.POST.get('title')
         text = request.POST.get('text')
         user = request.user
-        encrypted_text = encryption(text, CRYPTO_KEY)
+        print(text)
+        encrypted_text = encryption(text)
+        print(encrypted_text)
         notes = Notes.objects.create(title=title, text=encrypted_text, user=user)
         notes.save()
         return JsonResponse({'message': "Note created successfully"})
@@ -81,8 +83,27 @@ def displayNotes(request):
     if request.method == "GET":
         user = request.user
         notes = Notes.objects.filter(user=user)
-        serialized_notes = serializers.serialize('json', notes)
-        return JsonResponse({'message': "Notes successfully listed", 'notes': serialized_notes}, status=200)
+        user_notes = []
+        for note in notes:
+            try:
+                decrypted_text = decryption(note.text)
+                user_note = {
+                    "model": "notes.notes",
+                    "pk": note.pk,
+                    "fields": {
+                        "text": decrypted_text,
+                        "title": note.title,
+                        "date_created": note.date_created,
+                        "user": note.user.id  # Use note.user.id to avoid serializing the entire user object
+                    }
+                }
+                print(user_note)
+                user_notes.append(user_note)
+            except Exception as e:
+                logger.error(f"Error decrypting note ID {note.pk}: {e}")
+                return JsonResponse({'message': f"Error decrypting note ID {note.pk}"}, status=500)
+
+        return JsonResponse({'message': "Notes successfully listed", 'notes': user_notes}, status=200)
 
     else:
         return JsonResponse({'message': "Invalid request method"}, status=400)
@@ -119,9 +140,9 @@ def changeNotes(request):
       return JsonResponse({'success': False, 'error': 'Invalid request method'}) 
 
 def deleteNotes(request):
-  print("deletion working")
   if request.method == 'POST':
     note_id = request.POST.get('note_id')
+    print(request.POST)
     try:
       note = Notes.objects.get(id=note_id)
       note.delete()
@@ -132,3 +153,60 @@ def deleteNotes(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
+"""@login_required    
+def displayNotes(request):
+    if request.method == "GET":
+        user = request.user
+        notes = Notes.objects.filter(user=user)
+        user_notes = []
+        #serialized_notes = serializers.serialize('json', notes)
+        #print(serialized_notes)
+        for note in notes:
+            user = {"model": "notes.notes", "pk":note.pk,"fields":{
+                "text":decryption(note.text.encode(),CRYPTO_KEY),"title":note.title,"date_created":note.date_created,"user":note.user
+            }}
+            user_notes.append(user)
+            print(user_notes)
+        return JsonResponse({'message': "Notes successfully listed", 'notes': user_notes}, status=200)
+
+    else:
+        return JsonResponse({'message': "Invalid request method"}, status=400)"""
+
+"""
+@login_required    
+def displayNotes(request):
+    if request.method == "GET":
+        print(f"Decryption Key: {key}")
+        user = request.user
+        notes = Notes.objects.filter(user=user)
+        user_notes = []
+
+        for note in notes:
+            try:
+                # Debugging: log the encrypted text and the key
+                logger.debug(f"Encrypted text (bytes): {note.text.encode()}")
+                logger.debug(f"CRYPTO_KEY: {key}")
+
+                decrypted_text = decryption(note.text.encode(), key)
+                logger.debug(f"Decrypted text: {decrypted_text}")
+
+                user_note = {
+                    "model": "notes.notes",
+                    "pk": note.pk,
+                    "fields": {
+                        "text": decrypted_text,
+                        "title": note.title,
+                        "date_created": note.date_created,
+                        "user": note.user.id  # Use note.user.id to avoid serializing the entire user object
+                    }
+                }
+                user_notes.append(user_note)
+            except Exception as e:
+                logger.error(f"Error decrypting note ID {note.pk}: {e}")
+                return JsonResponse({'message': f"Error decrypting note ID {note.pk}"}, status=500)
+
+        return JsonResponse({'message': "Notes successfully listed", 'notes': user_notes}, status=200)
+
+    else:
+        return JsonResponse({'message': "Invalid request method"}, status=400)
+"""

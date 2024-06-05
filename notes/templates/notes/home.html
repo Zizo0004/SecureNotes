@@ -88,6 +88,27 @@
     }
   });
 }
+function deleteNote(noteId) {
+  if (confirm('Are you sure you want to delete this note?')) {
+    $.ajax({
+      url: '{% url "deleteNotes" %}',
+      type: 'POST',
+      data: {
+        'note_id': noteId,
+        'csrfmiddlewaretoken': '{{ csrf_token }}'
+      },
+      success: function(response) {
+        console.log(response);
+        // Remove the note from the DOM
+        $(`[data-note-id="${noteId}"]`).remove();
+      },
+      error: function(xhr, status, error) {
+        console.log(error);
+      }
+    });
+  }
+}
+
     function displayNotes() {
       $.ajax({
         url: '{% url "displayNotes" %}',
@@ -100,8 +121,8 @@
             for(const n of notes){
               if (n.fields) { // Check if n.fields exists
                var noteElement = $('<div class="note"></div>');
-                noteElement.append('<h2>' + (n.fields.title || 'ti') + '</h2>');
-                noteElement.append('<p>' + (n.fields.text || 'it') + '</p>');
+                noteElement.append('<h2>' + (n.fields.title || 'Empty') + '</h2>');
+                noteElement.append('<p>' + (n.fields.text || 'Empty') + '</p>');
                 noteElement.append(`<button class="edit-btn" data-note-id="${n.pk}">Edit</button>`);
                 noteElement.append(`<button class="delete-btn" data-note-id="${n.pk}">Delete</button>`);
                 notesContainer.append(noteElement); 
@@ -109,6 +130,7 @@
             }
             $('.edit-btn').click(function() {
             var noteId = $(this).data('note-id');
+            console.log(noteId)
             openEditModal(noteId);
             });
           }
@@ -123,6 +145,9 @@
         }
       });
     }
+
+
+
     $('#edit-form').submit(function(event) {
       console.log('Edit form submit clicked');
       event.preventDefault(); 
@@ -156,40 +181,19 @@
   });
 });
 
-$('.delete-btn').click(function() {
-  console.log("clickeddddd")
-  var noteId = $(this).data('note-id');
-  // Perform delete action
-  deleteNote(noteId);
-});
-
-function deleteNote(noteId) {
-  if (confirm('Are you sure you want to delete this note?')) {
-    $.ajax({
-      url: '{% url "deleteNotes" %}',
-      type: 'POST',
-      data: {
-        'note_id': noteId,
-        'csrfmiddlewaretoken': '{{ csrf_token }}'
-      },
-      success: function(response) {
-        console.log(response.message);
-        // Remove the note from the DOM
-        $(`[data-note-id="${noteId}"]`).remove();
-      },
-      error: function(xhr, status, error) {
-        console.log(error);
-      }
-    });
-  }
-}
-
-    
 
 
     displayNotes()
     $(document).ready(function() {
       console.log("Document ready");
+
+      $(document).on('click', '.delete-btn', function() {
+        var noteId = $(this).data('note-id');
+      deleteNote(noteId);
+      location.reload()
+    });
+
+
       
       $('#save-note').click(function() {
         console.log("Button clicked");
@@ -215,6 +219,7 @@ function deleteNote(noteId) {
             console.log("AJAX success");
             $('#response-message').text('Note created successfully').css('color', 'green');
             $('#note-form')[0].reset();
+            location.reload()
           },
           error: function(xhr, status, error) {
             console.log("AJAX error");
