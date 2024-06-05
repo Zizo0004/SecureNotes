@@ -37,22 +37,28 @@
   </div>
 
   <div id="edit-modal" class="modal">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h2>Edit Note</h2>
-          </div>
-          <div class="modal-body">
-              <form id="edit-form">
-                  <input type="hidden" id="note-id-input" name="note_id">
-                  <input type="text" id="edit-title" placeholder="Title">
-                  <textarea id="edit-text" placeholder="Text"></textarea>
-              </form>
-          </div>
-          <div class="modal-footer">
-              <button type="submit" form="edit-form">Save</button>
-          </div>
-      </div>
-  </div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Note</h2>
+        </div>
+        <div class="modal-body">
+            <form id="edit-form">
+                <div id="editTitle">
+                    <label for="edit-title" style="color: #606c38; font-size: x-large;">Title:</label>
+                    <input type="text" id="edit-title" placeholder="Title">
+                </div>
+                <div id="editText">
+                    <label for="edit-text" style="color: #606c38; font-size: x-large;">Text:</label>
+                    <textarea id="edit-text" placeholder="Text"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" form="edit-form" >Save</button>
+        </div>
+    </div>
+</div>
+
 </body>
   
 
