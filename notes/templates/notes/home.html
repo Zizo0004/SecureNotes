@@ -3,18 +3,18 @@
 <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/flatly/bootstrap.min.css">
 {% load static %}
 <link rel="stylesheet" href="{% static 'notes/css/style.css' %}">
-<body>
-  <h1>Create Notes 📝</h1>
+<body style="background-color: #264653;">
+  <h1>Create Notes </h1>
   <form id="note-form" method="post">
       {% csrf_token %}
       <div id="containerTitle">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required>
+        <label for="title" >Title:</label>
+        <input type="text" id="title" name="title" required style="background-color: #fefae0;"> 
       </div>
 
       <div id="containerText">
         <label for="text">Text:</label>
-        <textarea id="text" placeholder="Drag box to expand for more space" name="text" required></textarea>
+        <textarea id="text" placeholder="Drag box to expand for more space" name="text" required style="background-color: #fefae0;"></textarea>
       </div>
 
       <div id="containerButton">
@@ -24,10 +24,10 @@
   
   <div id="response-message"></div>
 
-  <h1>My Notes 📁</h1>
+  <h1>My Notes </h1>
   <div id="notes-container">
       {% for note in serialized_notes %}
-          <div class="note">
+          <div class="note" style="background-color: #caf0f8;">
               <h2>{{ note.fields.title }}</h2>
               <p>{{ note.decrypted_text }}</p>
           </div>
@@ -38,21 +38,21 @@
 
   <div id="edit-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header" style="background-color: #264653;">
             <h2>Edit Note</h2>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" style="background-color: #fefae0;">
             <form id="edit-form">
                 <div id="editTitle">
-                    <label for="edit-title" style="color: #606c38; font-size: x-large;">Title:</label>
-                    <input type="text" id="edit-title" placeholder="Title">
+                    <label for="edit-title" style="color: #264653; font-size: x-large;">Title:</label>
+                    <input type="text" id="edit-title" placeholder="Title" style=" border: 3px solid #264653; background-color: #fefae0;" >
                 </div>
                 <div id="editText">
-                    <label for="edit-text" style="color: #606c38; font-size: x-large;">Text:</label>
-                    <textarea id="edit-text" placeholder="Text"></textarea>
+                    <label for="edit-text" style="color: #264653; font-size: x-large;">Text:</label>
+                    <textarea id="edit-text" placeholder="Text" style=" border: 3px solid #264653; background-color: #fefae0;"></textarea>
                 </div>
-                <div class="modal-footer">
-                <button type="submit" form="edit-form" >Save</button>
+                <div class="modal-footer" style="background-color: #264653;">
+                <button type="submit" form="edit-form" >Save Note 💾</button>
             </form>
         </div>
 

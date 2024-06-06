@@ -11,6 +11,8 @@ from django.http import JsonResponse
 from SecureNotes.settings import CRYPTO_KEY
 from django.core import serializers
 import logging
+import json
+
 logger = logging.getLogger(__name__)
 
 f = Fernet(CRYPTO_KEY)
@@ -93,17 +95,16 @@ def displayNotes(request):
                     "fields": {
                         "text": decrypted_text,
                         "title": note.title,
-                        "date_created": note.date_created,
                         "user": note.user.id  # Use note.user.id to avoid serializing the entire user object
                     }
                 }
-                print(user_note)
+                
                 user_notes.append(user_note)
+                print(type(user_notes))
             except Exception as e:
                 logger.error(f"Error decrypting note ID {note.pk}: {e}")
                 return JsonResponse({'message': f"Error decrypting note ID {note.pk}"}, status=500)
-
-        return JsonResponse({'message': "Notes successfully listed", 'notes': user_notes}, status=200)
+        return JsonResponse({'message': "Notes successfully listed", 'notes': json.dumps(user_notes)}, status=200)
 
     else:
         return JsonResponse({'message': "Invalid request method"}, status=400)
@@ -113,11 +114,12 @@ def displayNotes(request):
 def updateNotes(request):
     noteID = request.GET.get('note_id')
     note = Notes.objects.get(pk=noteID)
+    decrypted_text = decryption(note.text)
     note_data = {
       'pk': note.pk,
       'fields': {
           'title': note.title,
-          'text': note.text,
+          'text': decrypted_text,
           'date_created': note.date_created.isoformat(),
           'user': note.user.id
       }

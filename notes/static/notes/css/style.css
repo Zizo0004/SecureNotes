@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'cerebi';
-    src: url('/static/notes/fonts/Cerebri Sans SemiBold Italic.ttf') format('truetype');
-    font-weight: normal;
+    src: url('/static/notes/fonts/Cerebri Sans Bold Italic.ttf') format('truetype');
+    font-weight: bold;
     font-style: normal;
   }
   h1{
@@ -49,7 +49,7 @@ label {
     display: block;
     margin-top: 10px;
     margin-left: 15px;
-    color: #fefae0;
+    color: #caf0f8;
 }
 #note-form{
   display: flex;
@@ -76,6 +76,7 @@ input[type="text"]{
   border: 3px solid #fefae0;
   border-radius: 4px;
   box-sizing: border-box;
+  background-color: black;
 }
 
 button {
@@ -121,7 +122,7 @@ button:hover{
 .modal-content {
   background-color: #fefefe;
   margin: auto;
-  padding: 20px;
+  padding: 5px;
   border: 3px solid #888;
   width: 55%;
   height: 100%;
@@ -134,7 +135,7 @@ button:hover{
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #606c38;
+  background-color: #264653;
   color: white;
 }
 
